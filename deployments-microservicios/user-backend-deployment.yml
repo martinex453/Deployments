@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-backend
+  labels:
+    app: user-backend
+spec:
+  selector:
+    matchLabels:
+      app: user-backend
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: user-backend
+    spec:
+      containers:
+      - name: backend
+        image: martinex453/user:latest
+        ports:
+        - containerPort: 8002
+        env:
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: mysql-userdb
+              key: host
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: mysql-userdb
+              key: name
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mysql-user-credentials
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-user-credentials
+              key: password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-backend
+  labels:
+    app: user-backend
+spec:
+  selector:
+    app: user-backend
+  ports:
+    - nodePort: 30500
+      protocol: TCP
+      port: 8010
+      targetPort: 8002
+  type: NodePort

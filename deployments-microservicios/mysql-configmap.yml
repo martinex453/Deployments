@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-userdb
+data:
+  host: mysql
+  name: userBD
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-loandb
+data:
+  host: mysql
+  name: loanBD
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-simulatedb
+data:
+  host: mysql
+  name: simulateBD
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-requestdb
+data:
+  host: mysql
+  name: requestBD
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-evaluationdb
+data:
+  host: mysql
+  name: evaluationBD
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-documentdb
+data:
+  host: mysql
+  name: documentBD
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-init-script
+data:
+  init.sql: |
+    -- Crear bases de datos
+    CREATE DATABASE IF NOT EXISTS userBD;
+    CREATE DATABASE IF NOT EXISTS loanBD;
+    CREATE DATABASE IF NOT EXISTS simulateBD;
+    CREATE DATABASE IF NOT EXISTS requestBD;
+    CREATE DATABASE IF NOT EXISTS evaluationBD;
+    CREATE DATABASE IF NOT EXISTS documentBD;
+
+    -- Crear usuario y otorgar privilegios
+    CREATE USER IF NOT EXISTS 'martinTingeso'@'%' IDENTIFIED BY 'martinBD';
+    GRANT ALL PRIVILEGES ON userBD.* TO 'martinTingeso'@'%';
+    GRANT ALL PRIVILEGES ON loanBD.* TO 'martinTingeso'@'%';
+    GRANT ALL PRIVILEGES ON simulateBD.* TO 'martinTingeso'@'%';
+    GRANT ALL PRIVILEGES ON requestBD.* TO 'martinTingeso'@'%';
+    GRANT ALL PRIVILEGES ON evaluationBD.* TO 'martinTingeso'@'%';
+    GRANT ALL PRIVILEGES ON documentBD.* TO 'martinTingeso'@'%';
+    FLUSH PRIVILEGES;
