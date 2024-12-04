@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loan-backend
+  labels:
+    app: loan-backend
+spec:
+  selector:
+    matchLabels:
+      app: loan-backend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: loan-backend
+    spec:
+      containers:
+      - name: backend
+        image: martinex453/loan:latest
+        ports:
+        - containerPort: 8002
+        env:
+        - name: CF_HOST
+          value: "config-server"
+        - name: DB_HOST
+          value: "mysql-service"
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: mysql-loandb
+              key: name
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: mysql-user-credentials
+              key: username
+        - name: DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: mysql-luser-credentials
+              key: password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loan-backend
+  labels:
+    app: loan-backend
+spec:
+  selector:
+    app: loan-backend
+  ports:
+    - nodePort: 0
+      protocol: TCP
+      port: 8092
+      targetPort: 8002
+  type: NodePort

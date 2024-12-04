@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: document-backend
+  labels:
+    app: document-backend
+spec:
+  selector:
+    matchLabels:
+      app: document-backend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: document-backend
+    spec:
+      containers:
+      - name: backend
+        image: martinex453/document:latest
+        ports:
+        - containerPort: 8002
+        env:
+        - name: CF_HOST
+          value: "config-server"
+        - name: DB_HOST
+          value: "mysql-service"
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: mysql-documentdb
+              key: name
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: mysql-user-credentials
+              key: username
+        - name: DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: mysql-user-credentials
+              key: password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: document-backend
+  labels:
+    app: document-backend
+spec:
+  selector:
+    app: document-backend
+  ports:
+    - nodePort: 0
+      protocol: TCP
+      port: 8093
+      targetPort: 8002
+  type: NodePort
